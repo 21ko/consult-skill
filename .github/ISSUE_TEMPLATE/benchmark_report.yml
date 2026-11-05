@@ -1,0 +1,33 @@
+name: Benchmark or field report
+description: Share how the skill did on your own work, measured or observed.
+labels: ["field-report"]
+body:
+  - type: markdown
+    attributes:
+      value: "Real-world results are the most useful contribution. Describe your project in general terms only, and please don't paste private code."
+  - type: input
+    id: project
+    attributes:
+      label: Kind of project
+      placeholder: "Django + Postgres SaaS, ~40k lines"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type of report
+      options: [Benchmark run (run_design.py), Day-to-day use]
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: What happened?
+      description: Paste summarize.py output, or describe what the board or pre-mortem caught or missed. The cost lines in .consult/log.jsonl help.
+    validations:
+      required: true
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Was it worth it?
+      options: [Yes, Mixed, "No", Too early to tell]

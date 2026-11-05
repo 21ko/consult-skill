@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest a change to the skill, the scripts or the benchmark.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the situation where the skill falls short today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What do you suggest?
+    validations:
+      required: true
+  - type: checkboxes
+    id: behavior
+    attributes:
+      label: Scope
+      options:
+        - label: This changes how the skill makes decisions (SKILL.md, escalation rules or board prompts). I've read the "Changing the skill's behavior" section in CONTRIBUTING.md.

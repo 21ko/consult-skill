@@ -5,6 +5,8 @@ description = "Senior-level design decisions for cheap coding agents: a pre-mort
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [{ name = "Yahya Kossor" }]
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = []  # stdlib only; the skill's scripts need nothing else
 
 [project.urls]

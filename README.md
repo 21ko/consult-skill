@@ -144,3 +144,15 @@ uv run summarize.py
 ```
 To benchmark your own repo, write a tasks file (see `bench/design/tasks.example.json`): a vague
 prompt per task, a hidden checklist of what a strong solution considers, and the repo's check command.
+
+## Contributing
+
+Results from your own projects are the most useful contribution: open a
+[field report](https://github.com/21ko/consult-skill/issues/new?template=benchmark_report.yml).
+Changes to how the skill decides need before/after benchmark numbers on two repos. See
+[CONTRIBUTING.md](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md), and [SECURITY.md](SECURITY.md)
+for reporting vulnerabilities privately.
+
+## License
+
+[MIT](LICENSE) © Yahya Kossor

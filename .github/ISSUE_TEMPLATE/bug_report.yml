@@ -1,0 +1,38 @@
+name: Bug report
+description: Something in the scripts, the installer or the skill doesn't work.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "Thanks for reporting. Please don't paste private code or API keys."
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you ran, what you expected, and what you got instead.
+      placeholder: "uv run scripts/board.py -q ... -> 'no backend worked: ...'"
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Error output
+      description: The exact output or traceback. Remove anything private.
+      render: shell
+  - type: dropdown
+    id: host
+    attributes:
+      label: Agent
+      options: [Claude Code, Codex, Other / not relevant]
+    validations:
+      required: true
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Model backend
+      options: [claude CLI login, ANTHROPIC_API_KEY, Both, Not sure]
+  - type: input
+    id: env
+    attributes:
+      label: OS, Python and uv versions
+      placeholder: "macOS 15, Python 3.12, uv 0.11"
