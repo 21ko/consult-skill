@@ -1,0 +1,309 @@
+<title>Consult Skill Benchmark</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: a single reading column (lab-report style) with full-width figure panels; numbers in mono. */
+:root {
+  --bg: #f5f6f8;
+  --panel: #ffffff;
+  --ink: #15171c;
+  --muted: #565c68;
+  --line: #dde1e7;
+  --link: #1c5cab;
+  --s1: #2a78d6;  /* Haiku alone */
+  --s2: #eb6834;  /* Sonnet alone */
+  --s3: #1baf7a;  /* Haiku + consult skill */
+  --good-bg: #e3f3ea; --good-ink: #146b3a;
+  --bad-bg: #fbe9e5;  --bad-ink: #9c2f1d;
+  --mid-bg: #eef0f3;  --mid-ink: #4a505b;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121418; --panel: #1a1d22; --ink: #eceef2; --muted: #a4aab6; --line: #2d3139; --link: #86b6ef;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --good-bg: #16301f; --good-ink: #7fd6a2; --bad-bg: #3a1d17; --bad-ink: #f2a593; --mid-bg: #23272e; --mid-ink: #b9bfca;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121418; --panel: #1a1d22; --ink: #eceef2; --muted: #a4aab6; --line: #2d3139; --link: #86b6ef;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --good-bg: #16301f; --good-ink: #7fd6a2; --bad-bg: #3a1d17; --bad-ink: #f2a593; --mid-bg: #23272e; --mid-ink: #b9bfca;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 56px 72px; display: flex; flex-direction: column; gap: 48px; }
+a { color: var(--link); }
+a:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 3px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); letter-spacing: -0.015em; }
+h2 { font-size: 1.5rem; letter-spacing: -0.01em; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 65ch; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.eyebrow { font: 500 0.75rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lead { font-size: 1.15rem; color: var(--ink); }
+.muted { color: var(--muted); }
+.mono, td.num, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+header { display: flex; flex-direction: column; gap: 18px; }
+
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.stat b { font: 600 1.9rem/1 var(--mono); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 0.9rem; color: var(--muted); }
+@media (max-width: 560px) { .stats { grid-template-columns: 1fr; } }
+
+.figure { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+.figure figcaption { font-size: 0.9rem; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.875rem; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.chart { width: 100%; overflow-x: auto; }
+.chart svg { display: block; width: 100%; min-width: 540px; height: auto; }
+.chart text { fill: var(--muted); font: 12px var(--body); }
+.chart text.val { fill: var(--ink); font: 500 12px var(--mono); }
+.chart text.grp { fill: var(--ink); font: 600 13px var(--body); }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .bar { cursor: default; }
+.chart .bar:hover, .chart .bar:focus { opacity: 0.82; outline: none; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); font: 12px/1.45 var(--body); padding: 8px 10px; border-radius: 6px; max-width: 240px; z-index: 5; }
+.tip b { font-family: var(--mono); }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 0.72rem/1.2 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+tr.ship td { font-weight: 600; }
+.pill { display: inline-block; font: 500 0.75rem/1 var(--mono); padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.good { background: var(--good-bg); color: var(--good-ink); }
+.pill.bad { background: var(--bad-bg); color: var(--bad-ink); }
+.pill.mid { background: var(--mid-bg); color: var(--mid-ink); }
+
+.steps { display: grid; gap: 12px; }
+.step { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 12px; align-items: start; }
+.step .n { font: 600 1rem/2.2rem var(--mono); width: 2.2rem; height: 2.2rem; text-align: center; border: 1px solid var(--line); border-radius: 50%; background: var(--panel); }
+.step p { color: var(--muted); }
+.step h3 { margin-bottom: 4px; }
+
+ul.plain { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 8px; max-width: 65ch; }
+pre { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font: 13px/1.6 var(--mono); }
+footer { color: var(--muted); font-size: 0.875rem; border-top: 1px solid var(--line); padding-top: 20px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Benchmark report · November 2026</div>
+    <h1>Can a cheap model make senior-level design calls?</h1>
+    <p class="lead">I built <b>consult</b>, a skill that makes Claude Haiku write a pre-mortem before it codes and call a board of stronger models for risky changes. Then I measured it on two real codebases with a blind judge. On the changes that ripple through a codebase it beat Sonnet. On small features it made no difference.</p>
+    <div class="stats" aria-label="Headline numbers">
+      <div class="stat"><b>7.1</b><span>Haiku + skill on cross-cutting changes (Sonnet alone: 6.4, Haiku alone: 6.2)</span></div>
+      <div class="stat"><b>91</b><span>scored runs on 2 real repos, plus 35 rework sessions</span></div>
+      <div class="stat"><b>$82</b><span>total spent on the experiment, judge included</span></div>
+    </div>
+  </header>
+
+  <section aria-labelledby="result">
+    <div class="eyebrow">The result</div>
+    <h2 id="result">It helps exactly where mistakes are expensive</h2>
+    <p>Scores are 1–10 from a blind Opus judge with a hidden checklist. “Cross-cutting” means the task needed a new status, column or shared config: cancel a mission, editable pricing, webhooks, closing registration.</p>
+    <figure class="figure" id="fig1">
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:var(--s1)"></i>Haiku alone</span>
+        <span><i style="background:var(--s2)"></i>Sonnet alone</span>
+        <span><i style="background:var(--s3)"></i>Haiku + consult skill</span>
+      </div>
+      <div class="chart" id="chart1" role="img" aria-label="Average judge score by task type. Cross-cutting changes: Haiku alone 6.2, Sonnet alone 6.4, Haiku plus consult skill 7.1. Smaller features: Haiku alone 6.0, Sonnet alone 6.2, Haiku plus consult skill 6.2."></div>
+      <figcaption>Average first-try score, both repos. Hover a bar for run counts and cost.</figcaption>
+    </figure>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Task type</th><th class="num">Haiku alone</th><th class="num">Sonnet alone</th><th class="num">Haiku + skill</th></tr></thead>
+        <tbody>
+          <tr><td>Cross-cutting changes</td><td class="num">6.2 <span class="muted">(n=8)</span></td><td class="num">6.4 <span class="muted">(n=8)</span></td><td class="num"><b>7.1</b> <span class="muted">(n=9)</span></td></tr>
+          <tr><td>Smaller features</td><td class="num">6.0 <span class="muted">(n=10)</span></td><td class="num">6.2 <span class="muted">(n=10)</span></td><td class="num">6.2 <span class="muted">(n=7)</span></td></tr>
+          <tr><td>Model cost per task</td><td class="num">$0.08–0.13</td><td class="num">$0.34–0.44</td><td class="num">$0.18 small · $1.65 cross-cutting</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="time">
+    <div class="eyebrow">Counting your time</div>
+    <h2 id="time">Tokens are about 1% of what a change really costs</h2>
+    <p>Almost every run got approved eventually. The difference was how many review rounds it took. A rework loop sent each run's review issues back to the same agent session until the judge approved it, then added the judge's estimate of reviewer minutes, priced at $60/h. Measured on App A with the first version of the skill.</p>
+    <figure class="figure" id="fig2">
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:var(--s1)"></i>Haiku alone</span>
+        <span><i style="background:var(--s2)"></i>Sonnet alone</span>
+        <span><i style="background:var(--s3)"></i>Haiku + skill (v1)</span>
+      </div>
+      <div class="chart" id="chart2" role="img" aria-label="Total cost to approved work per task, model plus reviewer time: Haiku alone 57 dollars, Sonnet alone 54 dollars, Haiku plus skill version 1 43 dollars."></div>
+      <figcaption>Model cost + reviewer minutes at $60/h, per task, until approved.</figcaption>
+    </figure>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Setup</th><th class="num">Follow-ups</th><th class="num">Your minutes</th><th class="num">Model $</th><th class="num">Total</th></tr></thead>
+        <tbody>
+          <tr><td>Haiku alone</td><td class="num">1.2</td><td class="num">57</td><td class="num">$0.36</td><td class="num">$57</td></tr>
+          <tr><td>Sonnet alone</td><td class="num">1.3</td><td class="num">52</td><td class="num">$1.16</td><td class="num">$54</td></tr>
+          <tr class="ship"><td>Haiku + skill (v1)</td><td class="num">0.5</td><td class="num">42</td><td class="num">$1.04</td><td class="num">$43</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="how">
+    <div class="eyebrow">How the skill works</div>
+    <h2 id="how">Write the review before writing the code</h2>
+    <div class="steps">
+      <div class="step"><div class="n" aria-hidden="true">1</div><div><h3>A written pre-mortem, every design task</h3><p>Before the first edit Haiku fills a fixed template: the real need, <b>every place that writes the data it's about to change</b>, every reader, parent/child inheritance, the decision, and the five most likely reasons a strict reviewer would reject it. It costs almost nothing.</p></div></div>
+      <div class="step"><div class="n" aria-hidden="true">2</div><div><h3>A board meeting for cross-cutting changes</h3><p>A new column, table, status or config value, or more than one entry path, triggers a board. The rule is mechanical, so Haiku doesn't get to decide. Two Sonnet seats (architect and product) read the repo, take positions and rebut each other once, then an Opus chair writes a resolution with a plan, rejected options, risks and open questions. About $1–2 and 2–4 minutes.</p></div></div>
+      <div class="step"><div class="n" aria-hidden="true">3</div><div><h3>You approve, then Haiku builds</h3><p>The resolution goes to you before any code is written, with a default answer for every open question. If Haiku gets stuck twice on the same failure, a one-on-one consult diagnoses it.</p></div></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="tried">
+    <div class="eyebrow">What I tried</div>
+    <h2 id="tried">Seven setups, and the ones that failed</h2>
+    <p>The shipped version is the seventh. Two of the earlier ideas looked good on paper and didn't hold up.</p>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Setup</th><th class="num">App A</th><th class="num">App B</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td>Haiku alone</td><td class="num">5.9</td><td class="num">6.5</td><td><span class="pill mid">baseline</span></td></tr>
+          <tr><td>Sonnet alone</td><td class="num">5.9</td><td class="num">7.0</td><td><span class="pill mid">4× cost</span> no better than Haiku on App A</td></tr>
+          <tr><td>Haiku asks Sonnet one-on-one</td><td class="num">5.9</td><td class="num">–</td><td><span class="pill bad">no gain</span> a shallow question gets a shallow answer</td></tr>
+          <tr><td>Board on every task</td><td class="num">7.2</td><td class="num">–</td><td><span class="pill mid">pricey</span> $1.36 even for small changes</td></tr>
+          <tr><td>Soft pre-mortem (v1)</td><td class="num">6.7</td><td class="num">6.2</td><td><span class="pill bad">didn't generalize</span> Haiku skipped the steps on the new repo</td></tr>
+          <tr><td>v1 + board when needed</td><td class="num">6.8</td><td class="num">5.7</td><td><span class="pill bad">never escalated on repo 2</span> left to Haiku's judgment</td></tr>
+          <tr class="ship"><td>Shipped: required template + mechanical board</td><td class="num">6.7</td><td class="num">6.6</td><td><span class="pill good">ships</span> best on cross-cutting on both repos</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="lessons">
+    <div class="eyebrow">What I learned</div>
+    <h2 id="lessons">Cheap models skip anything optional</h2>
+    <ul class="plain">
+      <li><b>A second repo changed the conclusion.</b> The soft pre-mortem looked like a clear win on the first app (8/10 on two tasks for $0.04). On a FastAPI + React codebase it did nothing. The transcripts showed why: Haiku loaded the skill, explored, then decided "one check here covers every path" and skipped the written steps.</li>
+      <li><b>Make the important steps mechanical.</b> The fix was a required template and a board trigger based on facts (does the plan add a column?) instead of Haiku's own judgment. The board then fired on exactly the task that added a column, and that became the best result of any setup on the hardest task (8, 7 and 7 against Sonnet's 7 and 6).</li>
+      <li><b>Sonnet alone isn't automatically better.</b> On the first app it scored the same as Haiku (5.9 over 12 runs each). Most misses were design decisions, not code: which user is this, who may call this route, what else reads this status.</li>
+      <li><b>Measure the human.</b> Counting only tokens, the board looked like a waste. Counting review time, it was among the cheapest options.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="method">
+    <div class="eyebrow">Method and caveats</div>
+    <h2 id="method">How it was measured, and its limits</h2>
+    <ul class="plain">
+      <li>Two real apps, kept anonymous here: <b>App A</b> (Next.js + Postgres, 6 tasks) and <b>App B</b> (FastAPI + Postgres + React, 3 tasks). Requests were deliberately vague, like "let customers cancel" or "stop new people registering once it's full".</li>
+      <li>Each run works on a throwaway clone and is checked with the repo's own typecheck, lint and unit tests. A blind Opus judge then scores the diff against a hidden checklist without seeing the setup, the meeting logs or the agent's summary.</li>
+      <li>The judge is a model, not a person. Identical runs vary by about ±1 point, and the "minutes" are its estimates. With 3–12 runs per cell, differences under about one point may be noise.</li>
+      <li>I wrote the checklists, and the first pre-mortem was written after seeing the first app's feedback. That's why the second repo was added, and why that version isn't the one that ships.</li>
+      <li>No human was in the loop. In real use you also review the board's plan before any code is written, which these numbers don't capture.</li>
+      <li>An earlier round on six well-specified coding tasks with hidden tests found <b>no benefit</b>: Haiku already solves clear specs, and the skill correctly stays out of the way.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="try">
+    <div class="eyebrow">Try it</div>
+    <h2 id="try">Install in one command</h2>
+    <p>Works in Claude Code and Codex. Needs <a href="https://docs.astral.sh/uv/">uv</a> (or Python 3.9+) and the <span class="mono">claude</span> CLI or an API key. The scripts run in their own isolated environment, so they never touch your project's dependencies.</p>
+    <pre>uvx --from git+https://github.com/21ko/consult-skill consult-install            # user-level, Claude Code + Codex
+uvx --from git+https://github.com/21ko/consult-skill consult-install --project .  # one repo only</pre>
+    <p class="muted">The run records (scores and costs) are in the repository under <span class="mono">bench/design/results/</span>, and <span class="mono">summarize.py</span> rebuilds every table on this page. The apps' code and diffs are not published.</p>
+  </section>
+
+  <footer>Built and benchmarked by Yahya Kossor with Claude Code. Repository: <a href="https://github.com/21ko/consult-skill">github.com/21ko/consult-skill</a>.</footer>
+</div>
+
+<script>
+(function () {
+  function bars(el, groups, opts) {
+    var W = 640, left = 150, right = 56, barH = 18, gap = 2, groupGap = 22, top = 8, axisH = 26;
+    var rowsPerGroup = groups[0].bars.length;
+    var groupH = rowsPerGroup * barH + (rowsPerGroup - 1) * gap;
+    var H = top + groups.length * groupH + (groups.length - 1) * groupGap + axisH;
+    var max = opts.max, plotW = W - left - right;
+    var x = function (v) { return left + (v / max) * plotW; };
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    function add(tag, attrs, text) {
+      var n = document.createElementNS(ns, tag);
+      for (var k in attrs) n.setAttribute(k, attrs[k]);
+      if (text != null) n.textContent = text;
+      svg.appendChild(n); return n;
+    }
+    var plotBottom = H - axisH;
+    opts.ticks.forEach(function (t) {
+      add("line", { x1: x(t), x2: x(t), y1: top - 4, y2: plotBottom, "class": "grid" });
+      add("text", { x: x(t), y: plotBottom + 17, "text-anchor": "middle" }, opts.fmt(t));
+    });
+    var y = top;
+    groups.forEach(function (g) {
+      add("text", { x: 0, y: y + groupH / 2 + 4, "class": "grp" }, g.label);
+      g.bars.forEach(function (b) {
+        var w = Math.max(1, x(b.v) - left);
+        var r = add("path", {
+          d: "M" + left + "," + y + "h" + (w - 4) + "a4,4 0 0 1 4,4v" + (barH - 8) + "a4,4 0 0 1 -4,4h" + (-(w - 4)) + "z",
+          style: "fill: var(" + b.color + ")", "class": "bar", tabindex: "0",
+          "aria-label": b.name + ": " + opts.fmt(b.v) + " (" + b.note + ")"
+        });
+        r.dataset.tip = "<b>" + opts.fmt(b.v) + "</b> · " + b.name + "<br>" + b.note;
+        add("text", { x: x(b.v) + 6, y: y + barH / 2 + 4, "class": "val" }, opts.fmt(b.v));
+        y += barH + gap;
+      });
+      y += groupGap - gap;
+    });
+    el.appendChild(svg);
+    var fig = el.closest(".figure");
+    var tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; fig.appendChild(tip);
+    function show(e, t) {
+      tip.innerHTML = t.dataset.tip; tip.hidden = false;
+      var fr = fig.getBoundingClientRect(), tr = t.getBoundingClientRect();
+      var lx = (e && e.clientX ? e.clientX : tr.right) - fr.left + 12;
+      lx = Math.min(lx, fr.width - tip.offsetWidth - 8);
+      tip.style.left = Math.max(8, lx) + "px";
+      tip.style.top = (tr.top - fr.top - tip.offsetHeight - 6) + "px";
+    }
+    svg.querySelectorAll(".bar").forEach(function (b) {
+      b.addEventListener("mousemove", function (e) { show(e, b); });
+      b.addEventListener("focus", function () { show(null, b); });
+      b.addEventListener("mouseleave", function () { tip.hidden = true; });
+      b.addEventListener("blur", function () { tip.hidden = true; });
+    });
+  }
+  var score = function (v) { return v.toFixed(1); };
+  bars(document.getElementById("chart1"), [
+    { label: "Cross-cutting changes", bars: [
+      { name: "Haiku alone", v: 6.19, color: "--s1", note: "8 runs · $0.16/task" },
+      { name: "Sonnet alone", v: 6.38, color: "--s2", note: "8 runs · $0.51/task" },
+      { name: "Haiku + consult skill", v: 7.06, color: "--s3", note: "9 runs · $1.65/task · board on 9/9" } ] },
+    { label: "Smaller features", bars: [
+      { name: "Haiku alone", v: 6.0, color: "--s1", note: "10 runs · $0.05/task" },
+      { name: "Sonnet alone", v: 6.2, color: "--s2", note: "10 runs · $0.27/task" },
+      { name: "Haiku + consult skill", v: 6.21, color: "--s3", note: "7 runs · $0.18/task" } ] }
+  ], { max: 10, ticks: [0, 2, 4, 6, 8, 10], fmt: score });
+  bars(document.getElementById("chart2"), [
+    { label: "Cost to approved", bars: [
+      { name: "Haiku alone", v: 57, color: "--s1", note: "1.2 follow-ups · 57 reviewer min" },
+      { name: "Sonnet alone", v: 54, color: "--s2", note: "1.3 follow-ups · 52 reviewer min" },
+      { name: "Haiku + skill (v1)", v: 43, color: "--s3", note: "0.5 follow-ups · 42 reviewer min" } ] }
+  ], { max: 60, ticks: [0, 20, 40, 60], fmt: function (v) { return "$" + Math.round(v); } });
+})();
+</script>

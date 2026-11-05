@@ -1,0 +1,25 @@
+[project]
+name = "consult-skill"
+version = "0.2.0"
+description = "Senior-level design decisions for cheap coding agents: a pre-mortem plus a board of stronger models, as a Claude Code / Codex skill."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []  # stdlib only; the skill's scripts need nothing else
+
+[project.scripts]
+consult-install = "consult_skill:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# The wheel ships the installer as a module and the skill folder next to it.
+[tool.hatch.build.targets.wheel.force-include]
+"install.py" = "consult_skill/__init__.py"
+"skills/consult" = "consult_skill/skill"
+
+[tool.hatch.build.targets.sdist]
+include = ["install.py", "skills/consult", "README.md", "pyproject.toml"]
+
+[tool.uv]
+package = true

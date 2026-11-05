@@ -1,0 +1,21 @@
+{
+  "agent_prompt": "{task}\n\nWork in this repository. Make sensible product and engineering decisions and implement the change end-to-end, following the codebase's existing conventions. Run the project's checks. When you're done, reply with a short summary of what you decided and why.",
+  "check": "npx tsc --noEmit -p {work}",
+  "extra_tools": [],
+  "node_modules": ["."],
+  "conventions_hint": "the codebase's existing data layer, API conventions, i18n and design system",
+  "tasks": [
+    {
+      "id": "cancel-order",
+      "prompt": "Customers need to be able to cancel an order.",
+      "checklist": [
+        "Adds a cancelled state consistently: the status type, every place that renders or filters statuses, translations, and the schema/migration if statuses are constrained",
+        "Decides which states can be cancelled (e.g. not after shipping) and who may cancel; enforced on the server, not only hidden in the UI",
+        "Stops downstream side effects (fulfilment jobs, notifications, payment capture) or explicitly handles refunds",
+        "Every writer is covered: the web UI, the public API and any admin/background path that changes order status",
+        "Confirmation UX against accidental cancellation, and the order history shows the cancellation",
+        "Tests for the state transition and the authorization rule"
+      ]
+    }
+  ]
+}
