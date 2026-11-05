@@ -4,7 +4,11 @@ version = "0.2.0"
 description = "Senior-level design decisions for cheap coding agents: a pre-mortem plus a board of stronger models, as a Claude Code / Codex skill."
 readme = "README.md"
 requires-python = ">=3.9"
+authors = [{ name = "Yahya Kossor" }]
 dependencies = []  # stdlib only; the skill's scripts need nothing else
+
+[project.urls]
+Repository = "https://github.com/21ko/consult-skill"
 
 [project.scripts]
 consult-install = "consult_skill:main"
